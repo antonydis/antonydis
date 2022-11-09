@@ -1,7 +1,7 @@
 <h1 align="center"> Hi there, I'm Antony 👨🏾‍💻 </h1>
 
 <p align="center">
-<a href="https://antonydiaz.notion.site/"><img src="https://img.shields.io/badge/Portfolio-Antony%20Diaz-informational" alt="portfolio: https://antonydiaz.notion.site/"></a>
+<a href="https://antonydiaz.me/"><img src="https://img.shields.io/badge/Portfolio-Antony%20Diaz-informational" alt="portfolio: https://antonydiaz.notion.site/"></a>
 <a href="https://www.linkedin.com/in/antonydis/"><img src="https://img.shields.io/badge/-Antony_Diaz-%230077B5.svg?&style=flat&logo=linkedin&logoColor=white" alt="Linkedin: https://www.linkedin.com/in/antonydis/"></a>
 </p>
 
