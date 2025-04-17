@@ -13,7 +13,7 @@
 
 I'm a tech entrepreneur and builder passionate about AI, cybersecurity, and social impact.  
 
-I'm currently the CEO & cofounder of [AskAïa](https://askaia.ca), where we use AI to simplify the Canadian immigration process for newcomers — helping them navigate complex systems with clarity, empathy, and autonomy.
+CEO & cofounder of [AskAïa](https://askaia.ca). We combine technology with human experience to simplify the Canadian immigration process.
 
 🧠 I've worked on AI for cybersecurity in the financial sector and love solving complex problems at the intersection of technology and society.
 
@@ -27,7 +27,3 @@ I'm currently the CEO & cofounder of [AskAïa](https://askaia.ca), where we use 
 ## Contact
 💬 Ask me about AI, cybersecurity, immigration tech, or startup life.  
 📫 Reach me at: antonydis@askaia.ca
-
-<p align="center">
-  <img src="https://github.com/DukeNgn/DukeNgn/raw/output/github-contribution-grid-snake.svg" alt="snake"></center>
-</p>
