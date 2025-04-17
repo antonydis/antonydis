@@ -6,31 +6,27 @@
 </p>
 
 <p align="center">
-  <!--- Wakatime : 
-  <a href="https://wakatime.com/@antonydis"><img src="https://img.shields.io/badge/Wakatime-antonydis-success?&logo=wakatime&style=flat" alt="Wakatime"></a>--->
 <img src="https://komarev.com/ghpvc/?username=antonydis&color=blue" alt="view count" />
 </p>
 
-
 # About me
 
-I have been leading tech startups in the Green and Edtech sector, solving complex math problems, and teaching data & low-code for social good.
-I’m currently learning about AI, blockchain and infosec.
+I'm a tech entrepreneur and builder passionate about AI, cybersecurity, and social impact.  
 
-I'm working on AI for cybersecurity in the financial sector.
-I'm also an active [Microsoft Student Ambassador](https://studentambassadors.microsoft.com/fr-FR/profile/2209).
+I'm currently the CEO & cofounder of [AskAïa](https://askaia.ca), where we use AI to simplify the Canadian immigration process for newcomers — helping them navigate complex systems with clarity, empathy, and autonomy.
+
+🧠 I've worked on AI for cybersecurity in the financial sector and love solving complex problems at the intersection of technology and society.
+
+🎤 I've spoken at TEDx, WeDay, and C2 Montreal about innovation, education, and inclusion.
 
 ## In the past
-- Cofounder of [Uvolt](https://www.kickstarter.com/projects/uvolt/uvolt-watch-accessible-clean-energy-to-charge-your-0).
-
-- Cybersecurity consultant at [Deloitte](https://www2.deloitte.com/ca/en/pages/risk/topics/deloitte-cyber.html) and [Desjardins](https://www.desjardins.com/securite/index.jsp?msclkid=db1440b7c32411ec95d78b53d3646967). 
-
-- TEDx, WeDay and C2 Montreal speaker.
+- Cofounder of [Uvolt](https://www.kickstarter.com/projects/uvolt/uvolt-watch-accessible-clean-energy-to-charge-your-0), a clean energy wearable.
+- [Microsoft Most Valuable Professional]([https://mvp.microsoft.com/en-us](https://mvp.microsoft.com/en-US/MVP/profile/5819b31b-da65-4256-8f6c-f7501c7a6784)) in Artificial Intelligence.
+- Cybersecurity consultant in the financial sector.
 
 ## Contact
-💬 Ask me about data science, cybersec & entrepreneurship.
-
-📫 How to reach me: antonydis@protonmail.com
+💬 Ask me about AI, cybersecurity, immigration tech, or startup life.  
+📫 Reach me at: antonydis@askaia.ca
 
 <p align="center">
   <img src="https://github.com/DukeNgn/DukeNgn/raw/output/github-contribution-grid-snake.svg" alt="snake"></center>
