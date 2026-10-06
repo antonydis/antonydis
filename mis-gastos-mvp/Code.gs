@@ -324,6 +324,7 @@ function installUserTriggers_(config) {
 
   ScriptApp.newTrigger('sendWeeklySummary')
     .timeBased()
+    .everyWeeks(1)
     .onWeekDay(ScriptApp.WeekDay.MONDAY)
     .atHour(Math.min(Number(config.reminderHour) + 1, 23))
     .inTimezone(config.timeZone)
