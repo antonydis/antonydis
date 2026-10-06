@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f5;
+      --card: #ffffff;
+      --text: #18211c;
+      --muted: #66706a;
+      --line: #dfe5e0;
+      --accent: #176b4a;
+      --accent-soft: #e7f3ed;
+      --danger: #a33a32;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); }
+    main { width: min(680px, 100%); margin: 0 auto; padding: 24px 16px 48px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+    h1 { margin: 0; font-size: 24px; letter-spacing: -0.02em; }
+    h2 { margin: 0 0 8px; font-size: 20px; }
+    p { line-height: 1.45; }
+    .muted { color: var(--muted); }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+    .hero { padding: 22px; }
+    textarea, input, select { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 14px; font: inherit; background: #fff; color: var(--text); outline: none; }
+    textarea { min-height: 104px; resize: vertical; }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    button, .button-link { min-height: 46px; border-radius: 14px; border: 1px solid transparent; padding: 11px 16px; font: inherit; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    button.primary { background: var(--accent); color: #fff; }
+    button.secondary, .button-link { background: #fff; color: var(--text); border-color: var(--line); }
+    button.ghost { background: transparent; color: var(--accent); border-color: transparent; }
+    button:disabled { opacity: .5; cursor: default; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .actions > * { flex: 1 1 150px; }
+    .mini-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .mini-actions button { font-weight: 600; background: var(--accent-soft); color: var(--accent); border: 0; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .stat span { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+    .stat strong { font-size: 20px; }
+    .expense { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .expense:first-child { border-top: 0; }
+    .expense small { color: var(--muted); }
+    .preview-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .preview-row .wide { grid-column: 1 / -1; }
+    .answer { white-space: pre-line; background: var(--accent-soft); border-radius: 14px; padding: 14px; margin-top: 12px; }
+    .hidden { display: none !important; }
+    .status { min-height: 22px; font-size: 14px; color: var(--muted); margin-top: 8px; }
+    .status.error { color: var(--danger); }
+    .top-link { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 14px; }
+    .divider { height: 1px; background: var(--line); margin: 18px 0; }
+    .privacy { font-size: 12px; color: var(--muted); margin-top: 16px; }
+    .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .setup-grid .wide { grid-column: 1 / -1; }
+    #photoInput { display: none; }
+    @media (max-width: 520px) {
+      main { padding-top: 18px; }
+      .stats { grid-template-columns: 1fr; }
+      .preview-row, .setup-grid { grid-template-columns: 1fr; }
+      .preview-row .wide, .setup-grid .wide { grid-column: 1; }
+      .actions > * { flex-basis: 100%; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Mis gastos</h1>
+    <a id="sheetLink" class="top-link hidden" href="#" target="_blank" rel="noopener">Abrir mi hoja</a>
+  </header>
+
+  <section id="setup" class="card hero hidden">
+    <h2>Empecemos</h2>
+    <p class="muted">Vamos a crear una hoja en tu Google Drive para guardar tus gastos. No necesitas organizar nada a mano.</p>
+    <div class="setup-grid">
+      <label class="wide">Moneda principal
+        <select id="currency">
+          <option value="NIO">Córdoba (NIO)</option>
+          <option value="CAD">Dólar canadiense (CAD)</option>
+          <option value="USD">Dólar estadounidense (USD)</option>
+          <option value="COP">Peso colombiano (COP)</option>
+          <option value="EUR">Euro (EUR)</option>
+        </select>
+      </label>
+      <label>Recordarme a las
+        <select id="reminderHour"></select>
+      </label>
+      <label>Zona horaria
+        <input id="timeZone" value="America/Managua" autocomplete="off">
+      </label>
+    </div>
+    <div class="actions"><button id="createBtn" class="primary" type="button">Crear mi registro</button></div>
+    <div id="setupStatus" class="status" aria-live="polite"></div>
+    <p class="privacy">La hoja queda en tu propia cuenta de Google.</p>
+  </section>
+
+  <section id="activation" class="card hidden">
+    <h2>Activar fotos y voz</h2>
+    <p class="muted">Esto se configura una sola vez. Si quien instaló la herramienta ya lo activó, no verás esta pantalla.</p>
+    <input id="apiKey" type="password" placeholder="Clave de procesamiento" autocomplete="off">
+    <div class="actions"><button id="saveKeyBtn" class="primary" type="button">Activar</button></div>
+    <div id="keyStatus" class="status" aria-live="polite"></div>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="card hero">
+      <h2 id="registerTitle">¿Qué gastaste?</h2>
+      <p class="muted" id="registerHint">Puedes escribirlo como te salga. Nosotros lo ordenamos.</p>
+      <textarea id="expenseText" placeholder="Ej. 850 en supermercado y 300 en gasolina"></textarea>
+      <input id="photoInput" type="file" accept="image/*" capture="environment">
+      <div class="actions">
+        <button id="registerBtn" class="primary" type="button">Registrar</button>
+        <button id="photoBtn" class="secondary" type="button">Tomar foto</button>
+        <button id="voiceBtn" class="secondary" type="button">Hablar</button>
+      </div>
+      <div id="registerStatus" class="status" aria-live="polite"></div>
+      <div id="preview" class="hidden"></div>
+      <div class="mini-actions">
+        <button id="noSpendBtn" type="button">No gasté nada</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span>Este mes</span><strong id="monthTotal">—</strong></div>
+      <div class="stat"><span>Donde más gastas</span><strong id="topCategory">—</strong></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h2>Entender mis gastos</h2>
+      <p class="muted">Elige una pregunta o escribe la tuya.</p>
+      <div class="mini-actions">
+        <button data-question="month_total" type="button">¿Cuánto llevo este mes?</button>
+        <button data-question="top_category" type="button">¿En qué estoy gastando más?</button>
+        <button data-question="compare_last_month" type="button">Comparar con el mes pasado</button>
+        <button data-question="largest_expenses" type="button">Ver mis gastos más grandes</button>
+        <button data-question="review_spending" type="button">¿Hay algo que debería mirar?</button>
+      </div>
+      <div class="divider"></div>
+      <input id="questionText" placeholder="Ej. ¿Cuánto gasté en gasolina?">
+      <div class="actions"><button id="askBtn" class="secondary" type="button">Ver respuesta</button></div>
+      <div id="answer" class="answer hidden" aria-live="polite"></div>
+    </div>
+
+    <div class="card">
+      <h2>Últimos gastos</h2>
+      <div id="latest"><p class="muted">Todavía no hay gastos.</p></div>
+    </div>
+
+    <p class="privacy">Tus gastos se guardan en tu Google Sheet. Las fotos y audios se usan para leer el movimiento y no se guardan en esta herramienta.</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const initialMode = <?!= JSON.stringify(initialMode) ?>;
+  const initialDate = <?!= JSON.stringify(initialDate) ?>;
+  const $ = (id) => document.getElementById(id);
+  let state = null;
+  let pendingExpenses = [];
+  let mediaRecorder = null;
+  let mediaChunks = [];
+
+  for (let h = 5; h <= 12; h++) {
+    const opt = document.createElement('option');
+    opt.value = h;
+    opt.textContent = h === 12 ? '12:00' : h + ':00';
+    if (h === 8) opt.selected = true;
+    $('reminderHour').appendChild(opt);
+  }
+
+  function call(name, ...args) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler((err) => reject(new Error(err && err.message ? err.message : String(err))))[name](...args);
+    });
+  }
+
+  function setStatus(id, message, error) {
+    const el = $(id);
+    el.textContent = message || '';
+    el.classList.toggle('error', Boolean(error));
+  }
+
+  function money(amount, currency) {
+    const n = Number(amount || 0);
+    try { return new Intl.NumberFormat('es', { style: 'currency', currency: currency || 'NIO', maximumFractionDigits: 2 }).format(n); }
+    catch (_) { return (currency || '') + ' ' + n.toFixed(2); }
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderState(next) {
+    state = next;
+    $('setup').classList.toggle('hidden', next.initialized);
+    $('app').classList.toggle('hidden', !next.initialized);
+    $('activation').classList.toggle('hidden', !next.initialized || next.processingReady);
+    $('sheetLink').classList.toggle('hidden', !next.initialized);
+    if (next.sheetUrl) $('sheetLink').href = next.sheetUrl;
+    if (next.initialized) renderDashboard(next.dashboard);
+
+    if (next.initialized && initialMode === 'sin-gastos') {
+      $('registerTitle').textContent = '¿Ayer no gastaste nada?';
+      $('registerHint').textContent = 'Confírmalo y lo dejamos registrado.';
+      $('expenseText').classList.add('hidden');
+      $('registerBtn').classList.add('hidden');
+      $('photoBtn').classList.add('hidden');
+      $('voiceBtn').classList.add('hidden');
+      $('noSpendBtn').textContent = 'Confirmar: no gasté nada';
+    } else if (next.initialized && initialDate) {
+      $('registerTitle').textContent = '¿Qué gastaste ayer?';
+    }
+  }
+
+  function renderDashboard(d) {
+    if (!d) return;
+    $('monthTotal').textContent = money(d.monthTotal, d.currency);
+    $('topCategory').textContent = d.topCategory ? d.topCategory : '—';
+    if (!d.latest || !d.latest.length) {
+      $('latest').innerHTML = '<p class="muted">Todavía no hay gastos.</p>';
+      return;
+    }
+    $('latest').innerHTML = d.latest.map((r) => '<div class="expense"><div><strong>' + escapeHtml(r.description) + '</strong><br><small>' + escapeHtml(r.category) + ' · ' + escapeHtml(r.date) + '</small></div><strong>' + escapeHtml(money(r.amount, r.currency)) + '</strong></div>').join('');
+  }
+
+  async function load() {
+    try { renderState(await call('getAppState')); }
+    catch (err) { document.body.innerHTML = '<main><div class="card"><h2>No pude abrir tu registro</h2><p>' + escapeHtml(err.message) + '</p></div></main>'; }
+  }
+
+  $('createBtn').addEventListener('click', async () => {
+    $('createBtn').disabled = true;
+    setStatus('setupStatus', 'Creando tu hoja…');
+    try {
+      const next = await call('initializeUser', {
+        currency: $('currency').value,
+        reminderHour: Number($('reminderHour').value),
+        timeZone: $('timeZone').value.trim() || 'America/Managua',
+      });
+      renderState(next);
+    } catch (err) { setStatus('setupStatus', err.message, true); }
+    finally { $('createBtn').disabled = false; }
+  });
+
+  $('saveKeyBtn').addEventListener('click', async () => {
+    const key = $('apiKey').value.trim();
+    if (!key) return setStatus('keyStatus', 'Pega la clave para continuar.', true);
+    $('saveKeyBtn').disabled = true;
+    setStatus('keyStatus', 'Activando…');
+    try {
+      await call('savePersonalApiKey', key);
+      $('apiKey').value = '';
+      renderState(await call('getAppState'));
+    } catch (err) { setStatus('keyStatus', err.message, true); }
+    finally { $('saveKeyBtn').disabled = false; }
+  });
+
+  $('registerBtn').addEventListener('click', async () => {
+    const text = $('expenseText').value.trim();
+    if (!text) return setStatus('registerStatus', 'Cuéntame qué gastaste.', true);
+    await processPayload({ type: 'text', text, contextDate: initialDate || 'today' });
+  });
+
+  $('photoBtn').addEventListener('click', () => $('photoInput').click());
+  $('photoInput').addEventListener('change', async () => {
+    const file = $('photoInput').files && $('photoInput').files[0];
+    if (!file) return;
+    setStatus('registerStatus', 'Leyendo la foto…');
+    try {
+      const data = await compressImage(file);
+      await processPayload({ type: 'image', base64: data.base64, mimeType: data.mimeType, contextDate: initialDate || 'today' });
+    } catch (err) { setStatus('registerStatus', err.message, true); }
+    finally { $('photoInput').value = ''; }
+  });
+
+  $('voiceBtn').addEventListener('click', async () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      $('voiceBtn').textContent = 'Hablar';
+      return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+      return setStatus('registerStatus', 'Tu navegador no permite grabar audio aquí. Puedes escribir el gasto.', true);
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.addEventListener('dataavailable', (e) => { if (e.data && e.data.size) mediaChunks.push(e.data); });
+      mediaRecorder.addEventListener('stop', async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(mediaChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+        setStatus('registerStatus', 'Leyendo lo que dijiste…');
+        try {
+          const base64 = await blobToBase64(blob);
+          await processPayload({ type: 'audio', base64, mimeType: blob.type || 'audio/webm', contextDate: initialDate || 'today' });
+        } catch (err) { setStatus('registerStatus', err.message, true); }
+      });
+      mediaRecorder.start();
+      $('voiceBtn').textContent = 'Terminar';
+      setStatus('registerStatus', 'Te escucho. Toca “Terminar” cuando acabes.');
+    } catch (err) { setStatus('registerStatus', 'No pude usar el micrófono. Revisa el permiso del navegador.', true); }
+  });
+
+  async function processPayload(payload) {
+    if (!state.processingReady) {
+      $('activation').classList.remove('hidden');
+      return setStatus('registerStatus', 'Primero activa fotos, voz y lectura automática.', true);
+    }
+    setStatus('registerStatus', payload.type === 'text' ? 'Ordenando el gasto…' : payload.type === 'image' ? 'Leyendo la foto…' : 'Leyendo lo que dijiste…');
+    $('registerBtn').disabled = true;
+    $('photoBtn').disabled = true;
+    $('voiceBtn').disabled = true;
+    try {
+      const result = await call('processExpenseInput', payload);
+      if (result.needsClarification) {
+        setStatus('registerStatus', result.question || 'Necesito un dato más.', true);
+        if (result.expenses && result.expenses.length) renderPreview(result.expenses);
+        return;
+      }
+      pendingExpenses = result.expenses || [];
+      renderPreview(pendingExpenses);
+      setStatus('registerStatus', 'Revisa y guarda.');
+    } catch (err) { setStatus('registerStatus', err.message, true); }
+    finally {
+      $('registerBtn').disabled = false;
+      $('photoBtn').disabled = false;
+      $('voiceBtn').disabled = false;
+    }
+  }
+
+  function renderPreview(expenses) {
+    pendingExpenses = expenses || [];
+    if (!pendingExpenses.length) return $('preview').classList.add('hidden');
+    $('preview').classList.remove('hidden');
+    $('preview').innerHTML = '<div class="divider"></div><strong>' + (pendingExpenses.length === 1 ? 'Encontré este gasto' : 'Encontré estos gastos') + '</strong>' + pendingExpenses.map((e, i) => `
+      <div class="preview-row" data-index="${i}">
+        <label class="wide">Descripción<input data-field="description" value="${escapeHtml(e.description)}"></label>
+        <label>Monto<input data-field="amount" inputmode="decimal" value="${escapeHtml(e.amount)}"></label>
+        <label>Moneda<input data-field="currency" maxlength="3" value="${escapeHtml(e.currency)}"></label>
+        <label>Fecha<input data-field="date" type="date" value="${escapeHtml(e.date)}"></label>
+        <label>Categoría<input data-field="category" value="${escapeHtml(e.category)}"></label>
+        <label class="wide">Comercio<input data-field="merchant" value="${escapeHtml(e.merchant || '')}"></label>
+      </div>`).join('') + '<div class="actions"><button id="saveExpensesBtn" class="primary" type="button">Guardar</button><button id="cancelPreviewBtn" class="secondary" type="button">Cancelar</button></div>';
+
+    $('saveExpensesBtn').addEventListener('click', savePreview);
+    $('cancelPreviewBtn').addEventListener('click', () => {
+      pendingExpenses = [];
+      $('preview').classList.add('hidden');
+      setStatus('registerStatus', '');
+    });
+  }
+
+  async function savePreview() {
+    const rows = Array.from($('preview').querySelectorAll('.preview-row'));
+    const expenses = rows.map((row, i) => {
+      const updated = Object.assign({}, pendingExpenses[i]);
+      row.querySelectorAll('[data-field]').forEach((input) => { updated[input.dataset.field] = input.dataset.field === 'amount' ? Number(input.value) : input.value.trim(); });
+      return updated;
+    });
+    $('saveExpensesBtn').disabled = true;
+    setStatus('registerStatus', 'Guardando…');
+    try {
+      const result = await call('saveExpenses', expenses);
+      $('expenseText').value = '';
+      pendingExpenses = [];
+      $('preview').classList.add('hidden');
+      renderDashboard(result.dashboard);
+      setStatus('registerStatus', result.count === 1 ? 'Listo. Gasto guardado.' : 'Listo. Gastos guardados.');
+    } catch (err) { setStatus('registerStatus', err.message, true); }
+    finally { if ($('saveExpensesBtn')) $('saveExpensesBtn').disabled = false; }
+  }
+
+  $('noSpendBtn').addEventListener('click', async () => {
+    $('noSpendBtn').disabled = true;
+    setStatus('registerStatus', 'Guardando…');
+    try {
+      const result = await call('markNoExpenses', initialDate || 'today');
+      renderDashboard(result.dashboard);
+      setStatus('registerStatus', 'Listo. Quedó registrado que no tuviste gastos.');
+    } catch (err) { setStatus('registerStatus', err.message, true); }
+    finally { $('noSpendBtn').disabled = false; }
+  });
+
+  document.querySelectorAll('[data-question]').forEach((btn) => btn.addEventListener('click', async () => {
+    await showAnswer(() => call('runQuickQuestion', btn.dataset.question, ''));
+  }));
+
+  $('askBtn').addEventListener('click', async () => {
+    const q = $('questionText').value.trim();
+    if (!q) return;
+    await showAnswer(() => call('askQuestion', q));
+  });
+
+  async function showAnswer(fn) {
+    $('answer').classList.remove('hidden');
+    $('answer').textContent = 'Revisando…';
+    try { const result = await fn(); $('answer').textContent = result.answer; }
+    catch (err) { $('answer').textContent = err.message; }
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const max = 1600;
+          let w = img.width;
+          let h = img.height;
+          if (Math.max(w, h) > max) {
+            const scale = max / Math.max(w, h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+          resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg' });
+        };
+        img.src = String(reader.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
